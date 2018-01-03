@@ -3,6 +3,13 @@ Release history for Module-Spec
 
 {{$NEXT}}
 
+v0.4     2018-01-03 12:34:13-08:00 America/Los_Angeles
+
+    - On try_module, only forgive "Can't locate " missing module errors
+    - Document that exceptions are not throw from the perspective of the caller
+    - Document that single quotes are not accepted as package separators
+    - Extend and improve tests
+
 v0.3     2018-01-02 21:34:58-08:00 America/Los_Angeles
 
     - Implement need_module($spec, { require => $r })
