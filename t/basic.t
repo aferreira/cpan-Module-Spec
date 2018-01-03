@@ -1,6 +1,12 @@
 
 use Test::More 0.88;
-use zim 'Module::Spec::V1' => qw(need_module try_module);
+
+use Module::Spec::V1 ();
+
+BEGIN {
+    *need_module = \*Module::Spec::V1::need_module;
+    *try_module  = \*Module::Spec::V1::try_module;
+}
 
 use lib qw(t/lib);
 
