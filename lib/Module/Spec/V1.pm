@@ -101,8 +101,14 @@ sub try_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
+    if ( $opts->{require}->( $m, @v ) ) {
+        eval { _require_module($m) };
+        if ($@) {
+            my $err = $@;
+            $err =~ /\ACan't locate\b/ ? return : die $err;
+        }
+    }
     eval {
-        _require_module($m) if $opts->{require}->( $m, @v );
         $m->VERSION(@v) if @v;
         1;
     }
