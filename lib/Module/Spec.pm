@@ -11,7 +11,15 @@ use Module::Spec::V1 ();
 
 sub new {
     my ( $self, %args ) = @_;
-    Module::Spec::V1::croak qq{What version?} unless my $v = $args{ver};
+
+    Module::Spec::V1::croak qq{What version?} unless exists $args{ver};
+
+    my $v = $args{ver};
+    unless ( defined $v && $v =~ /\A[0-9]+\z/ ) {
+        Module::Spec::V1::croak(qq{Invalid version ($v)}) if defined $v;
+        Module::Spec::V1::croak(qq{Undefined version});
+    }
+
     Module::Spec::V1::_require_module( my $m = "Module::Spec::V$v" );
     return bless {}, $m;
 }
