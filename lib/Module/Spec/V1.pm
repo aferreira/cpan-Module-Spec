@@ -247,4 +247,14 @@ with C<require> or false otherwise.
 
 =back
 
+=head1 CAVEATS
+
+=over 4
+
+=item *
+
+Single quotes (C<'>) are not accepted as package separators.
+
+=back
+
 =cut
