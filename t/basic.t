@@ -11,34 +11,34 @@ use lib qw(t/lib);
 
 {
     my $m = need_module('Foo');
-    is $m, 'Foo';
+    is $m, 'Foo', 'simple need_module';
 }
 {
     my $m = need_module('Foo~0.1.2');
-    is $m, 'Foo';
+    is $m, 'Foo', 'need_module with version';
 }
 {
     my $m = need_module('Foo~0.1.0');
-    is $m, 'Foo';
+    is $m, 'Foo', 'need_module with version';
 }
 {
     my ( $m, $v ) = need_module('Foo');
-    is $m, 'Foo';
-    is $v, Foo->VERSION;
+    is_deeply [ $m, $v ], [ 'Foo', Foo->VERSION ],
+      'simple need_module in list context';
 }
 {
     my ( $m, $v ) = need_module('Foo~0.1.2');
-    is $m, 'Foo';
-    is $v, Foo->VERSION;
+    is_deeply [ $m, $v ], [ 'Foo', Foo->VERSION ],
+      'need_module with version in list context';
 }
 {
     my ( $m, $v ) = need_module('Foo~0.1.0');
-    is $m, 'Foo';
-    is $v, Foo->VERSION;
+    is_deeply [ $m, $v ], [ 'Foo', Foo->VERSION ],
+      'need_module with version in list context';
 }
 {
     my $m = eval { need_module('Foo~0.2.0'); };
-    ok !$m, 'failure to load due to wrong version';
+    ok !$m, 'need_module with version fails on bad version';
 }
 {
 
