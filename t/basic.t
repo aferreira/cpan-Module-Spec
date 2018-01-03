@@ -1,6 +1,5 @@
 
 use Test::More 0.88;
-
 use Module::Spec::V1 ();
 
 BEGIN {
@@ -39,7 +38,34 @@ use lib qw(t/lib);
 }
 {
     my $m = eval { need_module('Foo~0.2.0'); };
-    ok !$m;
+    ok !$m, 'failure to load due to wrong version';
+}
+{
+
+    package FooFoo;    # Inline package, should not be required
+    our $VERSION = '3.4';
+    sub do_foo { }
+}
+{
+    my $m = need_module( 'FooFoo', { require => 0 } );
+    is $m, 'FooFoo', 'need_module with disabled "require"';
+}
+{
+    my $m = need_module( 'FooFoo~3', { require => 0 } );
+    is $m, 'FooFoo', 'need_module with version + disabled "require"';
+}
+{
+    my $m = eval { need_module( 'FooFoo~4', { require => 0 } ) };
+    ok !$m,
+      'need_module with version + disabled "require" fails on bad version';
+}
+{
+    my $m = need_module(
+        'FooFoo~3',
+        {   require => sub { !shift->can('do_foo') }
+        }
+    );
+    is $m, 'FooFoo', 'need_module with version + dynamic "require"';
 }
 
 done_testing;
