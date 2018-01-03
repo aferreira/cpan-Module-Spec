@@ -7,6 +7,8 @@ use 5.010001;
 # use strict;
 # use warnings;
 
+use Safe::Isa ();
+
 our @EXPORT_OK = qw(need_module try_module);
 
 state $MODULE_RE  = qr/ [^\W\d]\w*+ (?: :: \w++ )*+ /x;
@@ -59,24 +61,47 @@ sub _parse_version_spec {    # Extra sanity check
     goto &_parse_v_spec;
 }
 
+# Precomputed for most common case
+state $_OPTS = _opts();
+
 # need_module($spec)
+# need_module($spec, \%opts)
 sub need_module {
+    shift if $_[0]->$Safe::Isa::_isa(__PACKAGE__);    # Discard invocant
+
+    my $opts = @_ > 1 ? _opts(pop) : $_OPTS;
+
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    _require_module($m);
+    _require_module($m) if $opts->{require}->( $m, @v );
     $m->VERSION(@v) if @v;
     return wantarray ? ( $m, $m->VERSION ) : $m;
+}
+
+sub _opts {
+    my %opts = ( require => 1, %{ shift // {} } );
+
+    my $v = $opts{require};
+    $opts{require} = ref $v eq 'CODE' ? $v : sub {$v};
+
+    return \%opts;
 }
 
 # Diagnostics:
 #  Can't locate Foo.pm in @INC (you may need to install the Foo module) (@INC contains:
 #  Carp version 2.3 required--this is only version 1.40
 
+# try_module($spec)
+# try_module($spec, \%opts)
 sub try_module {
+    shift if $_[0]->$Safe::Isa::_isa(__PACKAGE__);    # Discard invocant
+
+    my $opts = @_ > 1 ? _opts(pop) : $_OPTS;
+
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
     eval {
-        _require_module($m);
+        _require_module($m) if $opts->{require}->( $m, @v );
         $m->VERSION(@v) if @v;
         1;
     }
@@ -146,6 +171,9 @@ L<Module::Spec::V1> implements the following functions.
     $module = need_module( { SomeModule => '2.3' } );
     $module = need_module( [ SomeModule => '2.3' ] );
 
+    $module = need_module($spec);
+    $module = need_module($spec, \%opts);
+
 Loads a module and checks for a version requirement (if any).
 Returns the name of the loaded module.
 
@@ -153,6 +181,70 @@ On list context, returns the name of the loaded module
 and its version (as reported by C<< $m->VERSION >>).
 
     ( $m, $v ) = need_module($spec);
+    ( $m, $v ) = need_module($spec, \%opts);
+
+These options are currently available:
+
+=over 4
+
+=item require
+
+    require => 1    # default
+    require => 0
+    require => sub { my ($m, $v) = @_; ... }
+
+Controls whether the specified module should be C<require>d or not.
+It can be given as a non-subroutine value, which gets
+interpreted as a boolean: true means that the module
+should be loaded with C<require> and false means
+that no attempt should be made to load it.
+This option can also be specified as a subroutine which gets
+passed the module name and version requirement (if any)
+and which should return true if the module should be loaded
+with C<require> or false otherwise.
+
+=back
+
+=head2 try_module
+
+    $module = try_module('SomeModule~2.3');
+    $module = try_module( { SomeModule => '2.3' } );
+    $module = try_module( [ SomeModule => '2.3' ] );
+
+    $module = try_module($spec);
+    $module = try_module($spec, \%opts);
+
+Tries to load a module (if available) and checks for a version
+requirement (if any). Returns the name of the loaded module
+if it can be loaded successfully and satisfies any specified version
+requirement.
+
+On list context, returns the name of the loaded module
+and its version (as reported by C<< $m->VERSION >>).
+
+    ( $m, $v ) = try_module($spec);
+    ( $m, $v ) = try_module($spec, \%opts);
+
+These options are currently available:
+
+=over 4
+
+=item require
+
+    require => 1    # default
+    require => 0
+    require => sub { my ($m, $v) = @_; ... }
+
+Controls whether the specified module should be C<require>d or not.
+It can be given as a non-subroutine value, which gets
+interpreted as a boolean: true means that the module
+should be loaded with C<require> and false means
+that no attempt should be made to load it.
+This option can also be specified as a subroutine which gets
+passed the module name and version requirement (if any)
+and which should return true if the module should be loaded
+with C<require> or false otherwise.
+
+=back
 
 =cut
-
