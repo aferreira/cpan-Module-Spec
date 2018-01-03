@@ -121,7 +121,7 @@ sub try_module {
 # TODO need_modules($spec1, $spec1)
 
 # Borrowed from Mojo::Util
-sub _class_to_path { join '.', join( '/', split( /::|'/, shift ) ), 'pm' }
+sub _class_to_path { join( '/', split( /::/, shift ) ) . '.pm' }
 
 sub _require_module { require(&_class_to_path) }
 
