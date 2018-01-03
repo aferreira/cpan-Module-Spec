@@ -82,7 +82,8 @@ sub _opts {
     my %opts = ( require => 1, %{ shift // {} } );
 
     my $v = $opts{require};
-    $opts{require} = sub {$v} unless ref $v eq 'CODE';
+    $opts{require} = sub {$v}
+      unless ref $v eq 'CODE';
 
     return \%opts;
 }
