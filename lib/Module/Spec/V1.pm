@@ -191,7 +191,7 @@ These options are currently available:
 
     require => 1    # default
     require => 0
-    require => sub { my ($m, $v) = @_; ... }
+    require => sub { my ($m, @v) = @_; ... }
 
 Controls whether the specified module should be C<require>d or not.
 It can be given as a non-subroutine value, which gets
@@ -233,7 +233,7 @@ These options are currently available:
 
     require => 1    # default
     require => 0
-    require => sub { my ($m, $v) = @_; ... }
+    require => sub { my ($m, @v) = @_; ... }
 
 Controls whether the specified module should be C<require>d or not.
 It can be given as a non-subroutine value, which gets
