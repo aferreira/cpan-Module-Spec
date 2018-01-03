@@ -263,6 +263,10 @@ with C<require> or false otherwise.
 
 Single quotes (C<'>) are not accepted as package separators.
 
+=item *
+
+Exceptions are not thrown from the perspective of the caller.
+
 =back
 
 =cut
