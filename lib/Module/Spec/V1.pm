@@ -82,14 +82,15 @@ sub _opts {
     my %opts = ( require => 1, %{ shift // {} } );
 
     my $v = $opts{require};
-    $opts{require} = ref $v eq 'CODE' ? $v : sub {$v};
+    $opts{require} = sub {$v} unless ref $v eq 'CODE';
 
     return \%opts;
 }
 
 # Diagnostics:
 #  Can't locate Foo.pm in @INC (you may need to install the Foo module) (@INC contains:
-#  Carp version 2.3 required--this is only version 1.40
+#  Carp version 2.3 required--this is only version 1.40 at
+#  Foo2 does not define $Foo2::VERSION--version check failed at
 
 # try_module($spec)
 # try_module($spec, \%opts)
