@@ -109,12 +109,12 @@ sub try_module {
             $err =~ /\ACan't locate\b/ ? return : die $err;
         }
     }
-    eval {
-        $m->VERSION(@v) if @v;
-        1;
+    if (@v) {
+        eval { $m->VERSION(@v) };
+        return if $@;
+
+        # FIXME might ignore and eat non-load/non-version-check errors
     }
-      or
-      return;   # FIXME might ignore and eat non-load/non-version-check errors
     return wantarray ? ( $m, $m->VERSION ) : $m;
 }
 
