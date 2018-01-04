@@ -20,8 +20,8 @@ sub new {
         Module::Spec::V1::croak(qq{Undefined version});
     }
 
-    Module::Spec::V1::_require_module( my $m = "Module::Spec::V${v}::OO" );
-    return bless {}, $m;
+    require Module::Spec::OO;
+    return bless {}, Module::Spec::OO->create_class($v);
 }
 
 1;
