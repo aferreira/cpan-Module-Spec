@@ -7,8 +7,6 @@ use 5.010001;
 # use strict;
 # use warnings;
 
-use Safe::Isa ();
-
 our @EXPORT_OK = qw(need_module try_module);
 
 state $MODULE_RE  = qr/ [^\W\d]\w*+ (?: :: \w++ )*+ /x;
@@ -67,8 +65,6 @@ state $_OPTS = _opts();
 # need_module($spec)
 # need_module($spec, \%opts)
 sub need_module {
-    shift if $_[0]->$Safe::Isa::_isa(__PACKAGE__);    # Discard invocant
-
     my $opts = @_ > 1 ? _opts(pop) : $_OPTS;
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
@@ -80,8 +76,6 @@ sub need_module {
 
 # generate_code($spec, \%opts);
 sub generate_code {
-    shift if $_[0]->$Safe::Isa::_isa(__PACKAGE__);    # Discard invocant
-
     my $opts = @_ > 1 ? pop : {};
     $opts->{context} ||= 'void';
     $opts->{indent}  ||= ' ' x 4;
@@ -128,8 +122,6 @@ sub _opts {
 # try_module($spec)
 # try_module($spec, \%opts)
 sub try_module {
-    shift if $_[0]->$Safe::Isa::_isa(__PACKAGE__);    # Discard invocant
-
     my $opts = @_ > 1 ? _opts(pop) : $_OPTS;
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
