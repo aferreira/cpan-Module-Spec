@@ -78,6 +78,38 @@ sub need_module {
     return wantarray ? ( $m, $m->VERSION ) : $m;
 }
 
+# generate_code($spec, \%opts);
+sub generate_code {
+    shift if $_[0]->$Safe::Isa::_isa(__PACKAGE__);    # Discard invocant
+
+    my $opts = @_ > 1 ? pop : {};
+    $opts->{context} ||= 'void';
+    $opts->{indent}  ||= ' ' x 4;
+
+    my ( $m, @v ) = _parse_module_spec( $_[-1] )
+      or croak(qq(Can't parse $_[-1]}));
+    my $code = "require $m;\n";
+    $code .= "$m->VERSION('$v[0]');\n" if @v;
+
+    if ( $opts->{context} eq 'void' ) {
+
+        # nothing to do
+    }
+    elsif ( $opts->{context} eq 'scalar' ) {
+        $code .= "'$m';\n";
+    }
+    elsif ( $opts->{context} eq 'list' ) {
+        $code .= "('$m', '$m'->VERSION);\n";
+    }
+
+    if ( $opts->{wrap} ) {
+        $code =~ s/^/$opts->{indent}/mg if $opts->{indent};
+        $code = "do {\n$code};\n";
+    }
+
+    return $code;
+}
+
 sub _opts {
     my %opts = ( require => 1, %{ shift // {} } );
 
