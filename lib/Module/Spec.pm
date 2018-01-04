@@ -7,17 +7,20 @@ use 5.010;
 # use strict;
 # use warnings;
 
-use Module::Spec::V1 ();
+BEGIN {
+    require Module::Spec::V1;
+    *croak = \&Module::Spec::V1::croak;
+}
 
 sub new {
     my ( $self, %args ) = @_;
 
-    Module::Spec::V1::croak qq{What version?} unless exists $args{ver};
+    croak qq{What version?} unless exists $args{ver};
 
     my $v = $args{ver};
     unless ( defined $v && $v =~ /\A[0-9]+\z/ ) {
-        Module::Spec::V1::croak(qq{Invalid version ($v)}) if defined $v;
-        Module::Spec::V1::croak(qq{Undefined version});
+        croak qq{Invalid version ($v)} if defined $v;
+        croak qq{Undefined version};
     }
 
     require Module::Spec::OO;
