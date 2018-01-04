@@ -152,10 +152,10 @@ sub try_module {
 
 # TODO need_modules($spec1, $spec1)
 
-# Borrowed from Mojo::Util
-sub _class_to_path { join( '/', split( /::/, shift ) ) . '.pm' }
-
-sub _require_module { require(&_class_to_path) }
+sub _require_module {
+    ( my $f = "$_[0].pm" ) =~ s{::}{/}g;
+    require $f;
+}
 
 sub croak {
     require Carp;
