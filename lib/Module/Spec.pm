@@ -20,7 +20,7 @@ sub new {
         Module::Spec::V1::croak(qq{Undefined version});
     }
 
-    Module::Spec::V1::_require_module( my $m = "Module::Spec::V$v" );
+    Module::Spec::V1::_require_module( my $m = "Module::Spec::V${v}::OO" );
     return bless {}, $m;
 }
 
