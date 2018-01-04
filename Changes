@@ -3,6 +3,11 @@ Release history for Module-Spec
 
 {{$NEXT}}
 
+v0.5     2018-01-04 15:57:01-08:00 America/Los_Angeles
+
+    - More param checking for Module::Spec->new()
+    - Fix a test, reducing requirement to Perl 5.10.1
+
 v0.4     2018-01-03 12:34:13-08:00 America/Los_Angeles
 
     - On try_module, only forgive "Can't locate " missing module errors
