@@ -38,4 +38,8 @@ sub new {
     my $ms = Module::Spec->new(ver => 1);
     $ms->need_module('Mango~2.3');
 
+=head1 DESCRIPTION
+
+B<This is alpha software. The API is likely to change.>
+
 =cut

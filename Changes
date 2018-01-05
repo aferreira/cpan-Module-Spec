@@ -3,6 +3,8 @@ Release history for Module-Spec
 
 {{$NEXT}}
 
+    - Add a note about the current status of the code (alpha quality)
+
 v0.5     2018-01-04 15:57:01-08:00 America/Los_Angeles
 
     - More param checking for Module::Spec->new()

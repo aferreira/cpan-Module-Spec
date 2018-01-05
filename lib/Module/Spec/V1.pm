@@ -167,6 +167,8 @@ sub croak {
 
 =head1 DESCRIPTION
 
+B<This is alpha software. The API is likely to change.>
+
 =head2 MODULE SPECS
 
 As string
