@@ -295,4 +295,8 @@ Exceptions are not thrown from the perspective of the caller.
 
 =back
 
+=head1 SEE ALSO
+
+L<Module::Runtime>
+
 =cut
