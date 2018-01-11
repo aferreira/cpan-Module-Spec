@@ -2,7 +2,6 @@
 package Module::Spec::OO;
 
 use 5.012;
-use strict;
 use warnings;
 
 use Class::Method::Modifiers 1.05 ();    # install_modifier

@@ -4,7 +4,6 @@ package Module::Spec::V1;
 # ABSTRACT: Load modules based on specifications V1
 use 5.012;
 
-# use strict;
 # use warnings;
 
 our @EXPORT_OK = qw(need_module try_module);
