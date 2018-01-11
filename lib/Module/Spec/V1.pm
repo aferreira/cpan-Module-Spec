@@ -134,9 +134,10 @@ sub try_module {
     }
     if (@v) {
         eval { $m->VERSION(@v) };
-        return if $@;
-
-        # FIXME might ignore and eat non-load/non-version-check errors
+        if ($@) {
+            my $err = $@;
+            $err =~ /\A\S+ version \S+ required--/ ? return : die $err;
+        }
     }
     return wantarray ? ( $m, $m->VERSION ) : $m;
 }
