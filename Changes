@@ -3,6 +3,8 @@ Release history for Module-Spec
 
 {{$NEXT}}
 
+v0.5.2     2018-01-11 13:04:34-08:00 America/Los_Angeles
+
     - Bump Perl requirement to 5.12.0
 
 v0.5.1     2018-01-05 08:41:58-08:00 America/Los_Angeles
