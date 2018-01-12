@@ -98,7 +98,44 @@ sub try_module {
     return _try_module( $opts, $m, @v );
 }
 
-# TODO need_modules($spec1, $spec1)
+# @m = need_modules($op, $spec1, $spec1)
+#
+# @M = need_modules(@spec);
+# @M = need_modules(-all, @spec);
+# @M = need_modules(-any, @spec);
+# @M = need_modules(-first, @spec);
+#
+# TODO
+# @M = need_modules(\%spec);
+# @M = need_modules(-all => \%spec);
+# @M = need_modules(-any => \%spec);
+#
+sub need_modules {
+    my $op = $_[0] =~ /\A-/ ? shift : '-all';
+    state $SUB_FOR = {
+        '-all'   => \&_need_all_modules,
+        '-any'   => \&_need_any_modules,
+        '-first' => \&_need_first_module
+    };
+    die qq{Unknown operator "$op"} unless my $sub = $SUB_FOR->{$op};
+    goto &$sub;
+}
+
+sub _need_all_modules {
+    map { scalar need_module($_) } @_;
+}
+
+sub _need_any_modules {
+    my ( @m, $m );
+    ( $m = try_module($_) ) && push @m, $m for @_;
+    return @m;
+}
+
+sub _need_first_module {
+    my $m;
+    ( $m = try_module($_) ) && return ($m) for @_;
+    return;
+}
 
 1;
 
