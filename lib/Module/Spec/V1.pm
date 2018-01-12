@@ -117,7 +117,7 @@ sub need_modules {
         '-any'   => \&_need_any_modules,
         '-first' => \&_need_first_module
     };
-    die qq{Unknown operator "$op"} unless my $sub = $SUB_FOR->{$op};
+    croak(qq{Unknown operator "$op"}) unless my $sub = $SUB_FOR->{$op};
     goto &$sub;
 }
 
