@@ -68,7 +68,7 @@ sub need_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    _require_module($m) if $opts->{require}->( $m, @v );
+    _require_module($m) if $opts->{REQUIRE} // $opts->{require}->( $m, @v );
     $m->VERSION(@v) if @v;
     return wantarray ? ( $m, $m->VERSION ) : $m;
 }
@@ -106,9 +106,8 @@ sub generate_code {
 sub _opts {
     my %opts = ( require => 1, %{ shift // {} } );
 
-    my $v = $opts{require};
-    $opts{require} = sub {$v}
-      unless ref $v eq 'CODE';
+    $opts{REQUIRE} = !!delete $opts{require}
+      unless ref $opts{require} eq 'CODE';
 
     return \%opts;
 }
@@ -125,7 +124,7 @@ sub try_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    if ( $opts->{require}->( $m, @v ) ) {
+    if ( $opts->{REQUIRE} // $opts->{require}->( $m, @v ) ) {
         eval { _require_module($m) };
         if ($@) {
             my $err = $@;
