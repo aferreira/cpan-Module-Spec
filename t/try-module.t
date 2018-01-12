@@ -24,8 +24,16 @@ use lib qw(t/lib);
     is $m, 'Foo', 'try_module with version';
 }
 {
+    my $m = try_module('Foo~0');
+    is $m, 'Foo', 'try_module("M~0")';
+}
+{
     my $m = try_module('NoVersion');
     is $m, 'NoVersion', 'try_module("M") on module with no version';
+}
+{
+    my $m = try_module('NoVersion~0');
+    is $m, 'NoVersion', 'try_module("M~0") on module with no version';
 }
 {
     my ( $m, $v ) = try_module('Foo');

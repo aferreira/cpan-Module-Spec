@@ -23,8 +23,16 @@ use lib qw(t/lib);
     is $m, 'Foo', 'need_module with version';
 }
 {
+    my $m = need_module('Foo~0');
+    is $m, 'Foo', 'need_module("M~0")';
+}
+{
     my $m = need_module('NoVersion');
     is $m, 'NoVersion', 'need_module("M") on module with no version';
+}
+{
+    my $m = need_module('NoVersion~0');
+    is $m, 'NoVersion', 'need_module("M~0") on module with no version';
 }
 {
     my ( $m, $v ) = need_module('Foo');
