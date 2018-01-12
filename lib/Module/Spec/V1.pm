@@ -136,7 +136,7 @@ sub try_module {
         eval { $m->VERSION(@v) };
         if ($@) {
             my $err = $@;
-            $err =~ /\A\S+ version \S+ required--/ ? return : die $err;
+            $err =~ /\A\S+ version \S+ required\b/ ? return : die $err;
         }
     }
     return wantarray ? ( $m, $m->VERSION ) : $m;
