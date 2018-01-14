@@ -34,7 +34,7 @@ sub new {
 
     use Module::Spec;
 
-    my $ms = Module::Spec->new(ver => 1);
+    my $ms = Module::Spec->new(ver => 2);
     $ms->need_module('Mango~2.3');
 
 =head1 DESCRIPTION
