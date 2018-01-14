@@ -1,7 +1,7 @@
 
-package Module::Spec::V1;
+package Module::Spec::V2;
 
-# ABSTRACT: Load modules based on specifications V1
+# ABSTRACT: Load modules based on V2 specifications
 use 5.012;
 
 # use warnings;
@@ -161,8 +161,8 @@ sub croak {
 
 =head1 SYNOPSIS
 
-    use Module::Spec::V1 ();
-    Module::Spec::V1::need_module('Mango~2.3');
+    use Module::Spec::V2 ();
+    Module::Spec::V2::need_module('Mango~2.3');
 
 =head1 DESCRIPTION
 
@@ -196,7 +196,7 @@ As an array ref
 
 =head1 FUNCTIONS
 
-L<Module::Spec::V1> implements the following functions.
+L<Module::Spec::V2> implements the following functions.
 
 =head2 need_module
 
