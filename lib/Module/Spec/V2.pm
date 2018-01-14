@@ -8,6 +8,16 @@ use 5.012;
 
 our @EXPORT_OK = qw(need_module try_module);
 
+BEGIN {
+    require Module::Spec::V0;
+    *_generate_code  = \&Module::Spec::V0::_generate_code;
+    *_opts           = \&Module::Spec::V0::_opts;
+    *_need_module    = \&Module::Spec::V0::_need_module;
+    *_require_module = \&Module::Spec::V0::_require_module;
+    *_try_module     = \&Module::Spec::V0::_try_module;
+    *croak           = \&Module::Spec::V0::croak;
+}
+
 state $MODULE_RE  = qr/ [^\W\d]\w*+ (?: :: \w++ )*+ /x;
 state $VERSION_RE = qr/ v?+ (?>\d+) (?: [\._] \d+ )*+ /x;
 
@@ -68,54 +78,17 @@ sub need_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    _require_module($m) if $opts->{REQUIRE} // $opts->{require}->( $m, @v );
-    $m->VERSION(@v) if @v;
-    return wantarray ? ( $m, $m->VERSION ) : $m;
+    return _need_module( $opts, $m, @v );
 }
 
 # generate_code($spec, \%opts);
 sub generate_code {
     my $opts = @_ > 1 ? pop : {};
-    $opts->{context} ||= 'void';
-    $opts->{indent}  ||= ' ' x 4;
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq(Can't parse $_[-1]}));
-    my $code = "require $m;\n";
-    $code .= "$m->VERSION('$v[0]');\n" if @v;
-
-    if ( $opts->{context} eq 'void' ) {
-
-        # nothing to do
-    }
-    elsif ( $opts->{context} eq 'scalar' ) {
-        $code .= "'$m';\n";
-    }
-    elsif ( $opts->{context} eq 'list' ) {
-        $code .= "('$m', '$m'->VERSION);\n";
-    }
-
-    if ( $opts->{wrap} ) {
-        $code =~ s/^/$opts->{indent}/mg if $opts->{indent};
-        $code = "do {\n$code};\n";
-    }
-
-    return $code;
+    return _generate_code( $opts, $m, @v );
 }
-
-sub _opts {
-    my %opts = ( require => 1, %{ shift // {} } );
-
-    $opts{REQUIRE} = !!delete $opts{require}
-      unless ref $opts{require} eq 'CODE';
-
-    return \%opts;
-}
-
-# Diagnostics:
-#  Can't locate Foo.pm in @INC (you may need to install the Foo module) (@INC contains:
-#  Carp version 2.3 required--this is only version 1.40 at
-#  Foo2 does not define $Foo2::VERSION--version check failed at
 
 # try_module($spec)
 # try_module($spec, \%opts)
@@ -124,36 +97,10 @@ sub try_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    if ( $opts->{REQUIRE} // $opts->{require}->( $m, @v ) ) {
-        eval { _require_module($m) };
-        if ($@) {
-            my $err = $@;
-            $err =~ /\ACan't locate\b/ ? return : die $err;
-        }
-    }
-    if (@v) {
-        eval { $m->VERSION(@v) };
-        if ($@) {
-            my $err = $@;
-            $err =~ /\A\S+ version \S+ required\b/ ? return : die $err;
-        }
-    }
-    return wantarray ? ( $m, $m->VERSION ) : $m;
+    return _try_module( $opts, $m, @v );
 }
 
 # TODO need_modules($spec1, $spec1)
-
-sub _require_module {
-    ( my $f = "$_[0].pm" ) =~ s{::}{/}g;
-    require $f;
-}
-
-sub croak {
-    require Carp;
-    no warnings 'redefine';
-    *croak = \&Carp::croak;
-    goto &croak;
-}
 
 1;
 
