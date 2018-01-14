@@ -2,10 +2,10 @@
 use Test::More 0.88;
 use Test::Fatal;
 
-use Module::Spec::V1 ();
+use Module::Spec::V2 ();
 
 BEGIN {
-    *need_module = \*Module::Spec::V1::need_module;
+    *need_module = \*Module::Spec::V2::need_module;
 }
 
 use lib qw(t/lib);
