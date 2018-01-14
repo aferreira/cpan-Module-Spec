@@ -7,8 +7,8 @@ use 5.012;
 # use warnings;
 
 BEGIN {
-    require Module::Spec::V1;
-    *croak = \&Module::Spec::V1::croak;
+    require Module::Spec::V0;
+    *croak = \&Module::Spec::V0::croak;
 }
 
 sub new {
