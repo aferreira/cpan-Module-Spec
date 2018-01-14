@@ -17,7 +17,7 @@ sub new {
     croak qq{What version?} unless exists $args{ver};
 
     my $v = $args{ver};
-    unless ( defined $v && $v =~ /\A[0-9]+\z/ ) {
+    unless ( defined $v && $v =~ /\A[1-9][0-9]*\z/ ) {
         croak qq{Invalid version ($v)} if defined $v;
         croak qq{Undefined version};
     }
