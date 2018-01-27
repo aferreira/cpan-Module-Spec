@@ -1,6 +1,7 @@
 
 package Module::Spec::OO;
 
+# ABSTRACT: OO support for Module::Spec
 use 5.012;
 use warnings;
 
