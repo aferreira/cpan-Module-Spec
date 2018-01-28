@@ -1,7 +1,7 @@
 
-package Module::Spec::V1;
+package Module::Spec::V2;
 
-# ABSTRACT: Load modules based on V1 specifications
+# ABSTRACT: Load modules based on V2 specifications
 use 5.012;
 
 # use warnings;
@@ -32,27 +32,29 @@ sub parse_module_spec {
 }
 
 sub _parse_module_spec {
-    if ( $_[0] =~ m/\A $MODULE_RE \z/x ) {
-        return $_[0];
+    if ( $_[0] =~ m/\A ($MODULE_RE) (?: ~ ($VERSION_RE) )? \z/x ) {
+        my ( $m, $v ) = ( $1, $2 );    # Make a copy
+        return ($m) unless $v;
+        return ( $m, _parse_v_spec($v) );
     }
     elsif ( ref $_[0] eq 'ARRAY' ) {
 
         croak(qq{Should contain one or two entries})
           unless @{ $_[0] } && @{ $_[0] } <= 2;
         my $m = $_[0][0];
-        $m =~ m/\A $MODULE_RE \z/x
+        my ( $m1, @v1 ) = _parse_module_spec($m)
           or croak(qq{Can't parse $m});
-        return ($m) if @{ $_[0] } == 1;
+        return ( $m1, @v1 ) if @{ $_[0] } == 1;
         my $v = $_[0][1];
-        return ( $m, _parse_version_spec($v) );
+        return ( $m1, _parse_version_spec($v) );
     }
     elsif ( ref $_[0] eq 'HASH' ) {
 
         croak(qq{Should contain a single pair}) unless keys %{ $_[0] } == 1;
         my ( $m, $v ) = %{ $_[0] };
-        $m =~ m/\A $MODULE_RE \z/x
+        my ($m1) = _parse_module_spec($m)
           or croak(qq{Can't parse $m});
-        return ( $m, _parse_version_spec($v) );
+        return ( $m1, _parse_version_spec($v) );
     }
     return;
 }
@@ -106,10 +108,8 @@ sub try_module {
 
 =head1 SYNOPSIS
 
-    use Module::Spec::V1 ();
-    Module::Spec::V1::need_module('Mango');
-    Module::Spec::V1::need_module( [ 'Mango' => '2.3' ] );
-    Module::Spec::V1::need_module( { 'Mango' => '2.3' } );
+    use Module::Spec::V2 ();
+    Module::Spec::V2::need_module('Mango~2.3');
 
 =head1 DESCRIPTION
 
@@ -119,7 +119,16 @@ B<This is alpha software. The API is likely to change.>
 
 As string
 
-    M               any version
+    M
+    M~V       minimum match, ≥ V
+    M~0       same as M, accepts any version
+
+Example version specs are
+
+    2
+    2.3
+    2.3.4
+    v3.2.3
 
 As a hash ref
 
@@ -134,16 +143,16 @@ As an array ref
 
 =head1 FUNCTIONS
 
-L<Module::Spec::V1> implements the following functions.
+L<Module::Spec::V2> implements the following functions.
 
 =head2 need_module
 
-    $module = need_module('SomeModule');
-    $module = need_module( { 'SomeModule' => '2.3' } );
-    $module = need_module( [ 'SomeModule' => '2.3' ] );
+    $module = need_module('SomeModule~2.3');
+    $module = need_module( { SomeModule => '2.3' } );
+    $module = need_module( [ SomeModule => '2.3' ] );
 
     $module = need_module($spec);
-    $module = need_module( $spec, \%opts );
+    $module = need_module($spec, \%opts);
 
 Loads a module and checks for a version requirement (if any).
 Returns the name of the loaded module.
@@ -152,7 +161,7 @@ On list context, returns the name of the loaded module
 and its version (as reported by C<< $m->VERSION >>).
 
     ( $m, $v ) = need_module($spec);
-    ( $m, $v ) = need_module( $spec, \%opts );
+    ( $m, $v ) = need_module($spec, \%opts);
 
 These options are currently available:
 
@@ -178,12 +187,12 @@ with C<require> or false otherwise.
 
 =head2 try_module
 
-    $module = try_module('SomeModule');
-    $module = try_module( { 'SomeModule' => '2.3' } );
-    $module = try_module( [ 'SomeModule' => '2.3' ] );
+    $module = try_module('SomeModule~2.3');
+    $module = try_module( { SomeModule => '2.3' } );
+    $module = try_module( [ SomeModule => '2.3' ] );
 
     $module = try_module($spec);
-    $module = try_module( $spec, \%opts );
+    $module = try_module($spec, \%opts);
 
 Tries to load a module (if available) and checks for a version
 requirement (if any). Returns the name of the loaded module
