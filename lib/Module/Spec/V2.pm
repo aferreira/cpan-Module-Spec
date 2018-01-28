@@ -100,7 +100,35 @@ sub try_module {
     return _try_module( $opts, $m, @v );
 }
 
-# TODO need_modules($spec1, $spec1)
+sub need_modules {
+    my $op = $_[0] =~ /\A-/ ? shift : '-all';
+    state $SUB_FOR = {
+        '-all'   => \&_need_all_modules,
+        '-any'   => \&_need_any_modules,
+        '-oneof' => \&_need_first
+    };
+    croak(qq{Unknown operator "$op"}) unless my $sub = $SUB_FOR->{$op};
+    if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
+        @_ = map { [ $_ => $_[0]{$_} ] } keys %{ $_[0] };
+    }
+    goto &$sub;
+}
+
+sub _need_all_modules {
+    map { scalar need_module($_) } @_;
+}
+
+sub _need_any_modules {
+    my ( @m, $m );
+    ( $m = try_module($_) ) && push @m, $m for @_;
+    return @m;
+}
+
+sub _need_first_module {
+    my $m;
+    ( $m = try_module($_) ) && return ($m) for @_;
+    return;
+}
 
 1;
 
@@ -182,6 +210,51 @@ This option can also be specified as a subroutine which gets
 passed the module name and version requirement (if any)
 and which should return true if the module should be loaded
 with C<require> or false otherwise.
+
+=back
+
+=head2 need_modules
+
+    @modules = need_modules(@spec);
+    @modules = need_modules(-all => @spec);
+    @modules = need_modules(-any => @spec);
+    @modules = need_modules(-oneof => @spec);
+
+    @modules = need_modules(\%spec);
+    @modules = need_modules(-all => \%spec);
+    @modules = need_modules(-any => \%spec);
+    @modules = need_modules(-oneof => \%spec);
+
+Loads some modules according to a specified rule.
+
+The current supported rules are C<-all>, C<-any> and C<-oneof>.
+If none of these are given as the first argument,
+C<-all> is assumed.
+
+The specified modules are given as module specs,
+either as a  list or as a single hashref.
+If given as a list, the corresponding order will be respected.
+If given as a hashref, a random order is to be expected.
+
+The behavior of the rules are as follows:
+
+=over 4
+
+=item -all
+
+All specified modules are loaded by C<need_module>.
+If successful, returns the names of the loaded modules.
+
+=item -any
+
+All specified modules are loaded by C<try_module>.
+Returns the names of the modules successfully loaded.
+
+=item -oneof
+
+Specified modules are loaded by C<try_module>
+until a successful load.
+Returns (in list context) the name of the loaded module.
 
 =back
 
