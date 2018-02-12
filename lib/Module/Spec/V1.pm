@@ -103,7 +103,7 @@ sub need_modules {
     state $SUB_FOR = {
         '-all'   => \&_need_all_modules,
         '-any'   => \&_need_any_modules,
-        '-oneof' => \&_need_first
+        '-oneof' => \&_need_first_module,
     };
     croak(qq{Unknown operator "$op"}) unless my $sub = $SUB_FOR->{$op};
     if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
