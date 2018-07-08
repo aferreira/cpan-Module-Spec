@@ -115,6 +115,11 @@ sub need_modules {
     goto &$sub;
 }
 
+sub try_modules {
+    unshift @_, '-any';
+    goto &need_modules;
+}
+
 sub _need_all_modules {
     map { scalar need_module($_) } @_;
 }
@@ -307,6 +312,16 @@ and which should return true if the module should be loaded
 with C<require> or false otherwise.
 
 =back
+
+=head2 try_modules
+
+    @modules = try_modules(@spec);
+    @modules = try_modules(\%spec);
+
+Shortcut for
+
+    @modules = need_modules(-any => @spec);
+    @modules = need_modules(-any => \%spec);
 
 =head1 CAVEATS
 
