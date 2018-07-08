@@ -78,7 +78,8 @@ sub need_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    return _need_module( $opts, $m, @v );
+    return _need_module( $opts, $m, @v ) unless $opts->{try};
+    return _try_module( $opts, $m, @v );
 }
 
 # generate_code($spec, \%opts);
@@ -210,6 +211,13 @@ This option can also be specified as a subroutine which gets
 passed the module name and version requirement (if any)
 and which should return true if the module should be loaded
 with C<require> or false otherwise.
+
+=item try
+
+    try => 0    # default
+    try => 1
+
+If C<try> is true, it behaves as L</"try_module">.
 
 =back
 
